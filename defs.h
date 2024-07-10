@@ -84,7 +84,15 @@ enum {
   F4,
   G4,
   H4,
-  A6 = 61,
+  A5 = 61,
+  B5,
+  C5,
+  D5,
+  E5,
+  F5,
+  G5,
+  H5,
+  A6 = 71,
   B6,
   C6,
   D6,
@@ -92,7 +100,7 @@ enum {
   F6,
   G6,
   H6,
-  A7 = 71,
+  A7 = 81,
   B7,
   C7,
   D7,
@@ -100,7 +108,7 @@ enum {
   F7,
   G7,
   H7,
-  A8 = 81,
+  A8 = 91,
   B8,
   C8,
   D8,
@@ -125,7 +133,7 @@ typedef struct {
 
 typedef struct {
   int places[BRD_SQ_NUM];
-  U64 pawns[0];
+  U64 pawns[3];
 
   int kingsSq[2];
 
@@ -152,6 +160,7 @@ typedef struct {
 /* MARCO */
 
 #define FR2SQ(f, r) ((21 + (f)) + ((r) * 10))
+#define SQ64(sq120) Sq120ToSq64[sq120]
 
 /* GLOBALS */
 
@@ -160,7 +169,7 @@ extern int Sq64ToSq120[64];
 
 /* FUNCTINOS */
 extern void AllInit();
-
+extern void PrintBitBoard(U64 bb);
 // init.c
 
 #endif
