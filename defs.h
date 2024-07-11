@@ -6,15 +6,15 @@
 #ifndef DEBUG
 #define ASSERT(n)
 #else
-#define ASSERT(n) \
-if(! (n)) { \
-printf("%s - Failed", #n); \
-printf("On %s", __DATE__); \
-printf("At %s", __TIME__); \
-printf("In %s", __FILE__); \
-printf("At Line %d\n", __LINE__); \
-exit(1); \
-}
+#define ASSERT(n)                                                              \
+  if (!(n)) {                                                                  \
+    printf("%s - Failed", #n);                                                 \
+    printf("On %s", __DATE__);                                                 \
+    printf("At %s", __TIME__);                                                 \
+    printf("In %s", __FILE__);                                                 \
+    printf("At Line %d\n", __LINE__);                                          \
+    exit(1);                                                                   \
+  }
 #endif
 
 typedef unsigned long long U64;
@@ -24,7 +24,10 @@ typedef unsigned long long U64;
 
 #define MAXGAMEMOVES 2048
 
-enum { EMPTY, wP, wR, wB, wN, wQ, wK, bP, bR, bB, bN, bQ, bK };
+#define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+enum { EMPTY, wP, wN, wB, wR, wQ, wK, bP, bN, bB, bR, bQ, bK };
+
 enum {
   FILE_A,
   FILE_B,
@@ -116,7 +119,8 @@ enum {
   F8,
   G8,
   H8,
-  NO_SQ
+  NO_SQ,
+  OFFBOARD
 };
 
 enum { TRUE, FALSE };
@@ -126,19 +130,19 @@ enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 typedef struct {
   int move;
   int castlePerm;
-  int enPass;
+  int enPas;
   int fiftyMove;
   U64 posKey;
 } S_UNDO;
 
 typedef struct {
-  int places[BRD_SQ_NUM];
+  int pieces[BRD_SQ_NUM];
   U64 pawns[3];
 
-  int kingsSq[2];
+  int KingSq[2];
 
   int side;
-  int enPass;
+  int enPas;
   int fiftyMove;
 
   int ply;
@@ -160,7 +164,8 @@ typedef struct {
 /* MARCO */
 
 #define FR2SQ(f, r) ((21 + (f)) + ((r) * 10))
-#define SQ64(sq120) Sq120ToSq64[sq120]
+#define SQ64(sq120) (Sq120ToSq64[(sq120)])
+#define SQ120(sq64) (Sq64ToSq120[(sq64)])
 #define POP(b) PopBit(b)
 #define CNT(b) CountBit(b)
 #define CLRBIT(bb, sq) ((bb) &= ClearMask[(sq)])
@@ -172,7 +177,13 @@ extern int Sq120ToSq64[BRD_SQ_NUM];
 extern int Sq64ToSq120[64];
 extern U64 SetMask[64];
 extern U64 ClearMask[64];
-
+extern U64 PieceKeys[13][120];
+extern U64 SideKey;
+extern U64 CastleKeys[16];
+extern char PceChar[];
+extern char SideChar[];
+extern char RankChar[];
+extern char FileChar[];
 /* FUNCTINOS */
 
 // init.c
@@ -182,4 +193,12 @@ extern void AllInit();
 extern void PrintBitBoard(U64 bb);
 extern int PopBit(U64 *bb);
 extern int CountBits(U64 b);
+
+// haskeys.c
+extern U64 GeneratePosKey(const S_BOARD *pos);
+
+// board.c
+extern void ResetBoard(S_BOARD *pos);
+extern int ParseFen(char *fen, S_BOARD *pos);
+extern void PrintBoard(const S_BOARD *pos);
 #endif

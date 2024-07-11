@@ -1,4 +1,9 @@
 #include "defs.h"
+#include "stdlib.h"
+
+#define RAND_64                                                                \
+  ((U64)rand() | (U64)rand() << 15 | (U64)rand() << 30 | (U64)rand() << 45 |   \
+   ((U64)rand() & 0xf) << 60)
 
 int Sq120ToSq64[BRD_SQ_NUM];
 int Sq64ToSq120[64];
@@ -6,18 +11,37 @@ int Sq64ToSq120[64];
 U64 SetMask[64];
 U64 ClearMask[64];
 
-void InitBitMasks() {
-    int index = 0;
+U64 PieceKeys[13][120];
+U64 SideKey;
+U64 CastleKeys[16];
 
-    for(index = 0; index <64; index++){
-        SetMask[index] = 0ULL;
-        ClearMask[index] = 0ULL;
+void InitHashKeys() {
+
+  for (int i = 0; i < 13; i++) {
+    for (int j = 0; j < 120; j++) {
+      PieceKeys[i][j] = RAND_64;
     }
-    
-    for(index = 0; index <64; index++){
-        SetMask[index] |= (1ULL << index);
-        ClearMask[index] = ~SetMask[index];
-    }
+  }
+
+  SideKey = RAND_64;
+
+  for (int i = 0; i < 16; i++) {
+    CastleKeys[i] = RAND_64;
+  }
+}
+
+void InitBitMasks() {
+  int index = 0;
+
+  for (index = 0; index < 64; index++) {
+    SetMask[index] = 0ULL;
+    ClearMask[index] = 0ULL;
+  }
+
+  for (index = 0; index < 64; index++) {
+    SetMask[index] |= (1ULL << index);
+    ClearMask[index] = ~SetMask[index];
+  }
 }
 
 void InitSq120To64() {
@@ -46,6 +70,7 @@ void InitSq120To64() {
 }
 
 void AllInit() {
-    InitSq120To64();
-    InitBitMasks();
+  InitSq120To64();
+  InitBitMasks();
+  InitHashKeys();
 }
